@@ -1,0 +1,113 @@
+{
+  "name": "Compare competitor Meta ads with Apify",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p",
+              "name": "previousDatasetId",
+              "value": "REPLACE_PREVIOUS_DATASET_ID",
+              "type": "string"
+            },
+            {
+              "id": "c",
+              "name": "currentDatasetId",
+              "value": "REPLACE_CURRENT_DATASET_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Configure snapshots",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/jtd23ventures~competitor-ad-change-tracker/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "maxTotalChargeUsd",
+              "value": "0.10"
+            },
+            {
+              "name": "memory",
+              "value": "128"
+            },
+            {
+              "name": "timeout",
+              "value": "60"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({previousDatasetId: $json.previousDatasetId, currentDatasetId: $json.currentDatasetId}) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "3",
+      "name": "Compare ads with JTD",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Configure snapshots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure snapshots": {
+      "main": [
+        [
+          {
+            "node": "Compare ads with JTD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
